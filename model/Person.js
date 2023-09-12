@@ -1,5 +1,3 @@
-const { text } = require("body-parser");
-
 const {Schema, model} = require('mongoose');
 
 const personSchema = new Schema({
