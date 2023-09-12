@@ -7,8 +7,8 @@ const { ObjectId } = require("bson");
 dotenv.config()
 const App = express();
 
-app.use(cors());
-app.options("*", cors());
+App.use(cors());
+App.options("*", cors());
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: false }));
