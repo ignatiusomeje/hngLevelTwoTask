@@ -1,11 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser")
-const cors = require('cors')
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const mongoose = require("mongoose");
-const dotenv = require('dotenv')
+const dotenv = require("dotenv");
 const Person = require("./model/Person");
 const { ObjectId } = require("bson");
-dotenv.config()
+dotenv.config();
 const App = express();
 
 App.use(cors());
@@ -20,58 +20,68 @@ mongoose.connect(process.env.MongoDB, {
 
 App.post("/api", async (req, res, next) => {
   try {
-    const name = req.body.name;
+    const bodyName = req.body.name;
+    if (bodyName === undefined || bodyName.trim() === ""){
+      return res.status(400).json('Invalid Body');
+    }
     const person = new Person({
-      name,
+      name: bodyName
     });
     const personData = await person.save();
-    return res.status(200).json(personData);
+    const { _id, name } = personData;
+    return res.status(200).json({ _id, name });
   } catch (error) {
     return res.status(400).json(error);
   }
 });
 App.get("/api/:user_id", async (req, res, next) => {
   try {
-    const id = req.params.user_id
-    if (!ObjectId.isValid(id)){
-      return res.status(400).json('Invalid Request Parameter')
+    const id = req.params.user_id;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json("Invalid Request Parameter");
     }
     const person = await Person.findById(id);
-    if (!person._id){
-      return res.status(404).json('Not Found');
+    if (!person) {
+      return res.status(404).json("Not Found");
     }
-    return res.status(200).json(person);
+    const { _id, name } = person;
+    return res.status(200).json({ _id, name });
   } catch (error) {
     return res.status(400).json(error.message);
   }
 });
 App.put("/api/:user_id", async (req, res, next) => {
   try {
-    const id = req.params.user_id
-    if (!ObjectId.isValid(id)){
-      return res.status(400).json('Invalid Request Parameter')
+    const id = req.params.user_id;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json("Invalid Request Parameter");
     }
     const person = await Person.findById(id);
-    if (!person._id){
-      return res.status(404).json('Not Found');
+    if (!person) {
+      return res.status(404).json("Not Found");
     }
     await person.set({
-      name: req.body.name
-    })
-    const response = await person.save()
-    return res.status(200).json(response)
+      name: req.body.name,
+    });
+    const response = await person.save();
+    const { _id, name } = response;
+    return res.status(200).json({ _id, name });
   } catch (error) {
     return res.status(400).json(error.message);
   }
 });
 App.delete("/api/:user_id", async (req, res, next) => {
   try {
-    const id = req.params.user_id
-    if (!ObjectId.isValid(id)){
-      return res.status(400).json('Invalid Request Parameter')
+    const id = req.params.user_id;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json("Invalid Request Parameter");
     }
-    await Person.findByIdAndDelete(id);
-    return res.status(200).json('User deleted Successfully')
+    const person = await Person.findByIdAndDelete(id);
+    if (!person) {
+      return res.status(404).json("Not Found");
+    }
+    const { _id, name } = person;
+    return res.status(200).json({ _id, name });
   } catch (error) {
     return res.status(400).json(error.message);
   }
