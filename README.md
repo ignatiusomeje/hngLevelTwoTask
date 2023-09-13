@@ -91,7 +91,12 @@ A path parameter is required as it specifies the user's id of the existing resou
   "_id": "6500a9e5f9fe9f93529f585f",
   "name": "Hadassah"
 }
-```  
+```
+`NOTE`: 
+
+if user's id is not valid, it will show a `400` status code with the message `"Invalid Request Parameter"`
+
+if the user's id is valid but the person is not found it will give you a `404` status code with the message `Not Found`
 
 
   
